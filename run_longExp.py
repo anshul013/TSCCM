@@ -110,6 +110,7 @@ parser.add_argument('--use_amp', action='store_true', help='use automatic mixed 
 parser.add_argument("--use_gpu", type=str2bool, nargs='?',
                         const=True, default=True,
                         help="use gpu")
+parser.add_argument('--cuda', type=int, default=0, help='cuda device number')
 parser.add_argument('--gpu', type=int, default=0, help='gpu')
 parser.add_argument('--use_multi_gpu', action='store_true', help='use multiple gpus', default=False)
 parser.add_argument('--devices', type=str, default='0,1,2,3', help='device ids of multile gpus')

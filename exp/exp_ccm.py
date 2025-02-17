@@ -97,7 +97,7 @@ class Exp_CCM(Exp_Basic):
             os.makedirs(path)
         with open(os.path.join(path, "args.json"), 'w') as f:
             json.dump(vars(self.args), f, indent=True)
-        scale_statistic = {'mean': train_data.scaler.mean_, 'std': train_data.scaler.std_}
+        scale_statistic = {'mean': train_data.scaler.mean_, 'std': train_data.scaler.scale_}
         with open(os.path.join(path, "scale_statistic.pkl"), 'wb') as f:
             pickle.dump(scale_statistic, f)
         # s_type = "DTW" if self.args.data in ["ILI", "ETTm2", "ETTm1", "EXR", "ETTh2"] else "EUC"

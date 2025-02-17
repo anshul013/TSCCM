@@ -59,9 +59,9 @@ class Exp_CCM(Exp_Basic):
         instance_num = 0
         
         with torch.no_grad():
-            for i, (batch_x,batch_y) in enumerate(vali_loader):
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(vali_loader):
                 pred, true = self._process_one_batch(
-                    vali_data, batch_x, batch_y, if_update=False)
+                    vali_data, batch_x, batch_y, batch_x_mark, batch_y_mark, if_update=False)
                 loss_f = nn.MSELoss()(pred.detach().cpu(), true.detach().cpu())
                 if self.args.individual == "c":
                     simMatrix = self.get_similarity_matrix(batch_x)
@@ -119,12 +119,12 @@ class Exp_CCM(Exp_Basic):
             
             self.model.train()
             epoch_time = time.time()
-            for i, (batch_x,batch_y) in enumerate(train_loader):
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
                 iter_count += 1
                 
                 model_optim.zero_grad()
                 pred, true = self._process_one_batch(
-                    train_data, batch_x, batch_y, if_update=True)
+                    train_data, batch_x, batch_y, batch_x_mark, batch_y_mark, if_update=True)
                 loss_f = criterion_ts(pred, true)
                 if self.args.individual == "c":
                     simMatrix = self.get_similarity_matrix(batch_x)
@@ -193,9 +193,9 @@ class Exp_CCM(Exp_Basic):
         instance_num = 0
         
         with torch.no_grad():
-            for i, (batch_x,batch_y) in enumerate(test_loader):
+            for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(test_loader):
                 pred, true = self._process_one_batch(
-                    test_data, batch_x, batch_y, inverse, if_update=False)
+                    test_data, batch_x, batch_y, batch_x_mark, batch_y_mark, inverse=False, if_update=False)
                 batch_size = pred.shape[0]
                 instance_num += batch_size
                 batch_metric = np.array(metric(pred.detach().cpu().numpy(), true.detach().cpu().numpy())) * batch_size
@@ -223,21 +223,29 @@ class Exp_CCM(Exp_Basic):
             np.save(folder_path+'true.npy', trues)
         return
 
-    def _process_one_batch(self, dataset_object, batch_x, batch_y, inverse = False, if_update=False):
+    def _process_one_batch(self, dataset_object, batch_x, batch_y, batch_x_mark, batch_y_mark, inverse=False, if_update=False):
         batch_x = batch_x.float().to(self.device)
         batch_y = batch_y.float().to(self.device)
-        #x: [Batch, Input length, Channel]
+        batch_x_mark = batch_x_mark.float().to(self.device)
+        batch_y_mark = batch_y_mark.float().to(self.device)
         
-        batch_size, input_length, channel = batch_x.shape
-
-        shuffled_indices = torch.randperm(channel)
-        batch_x = batch_x[:, :, shuffled_indices]
-        batch_y = batch_y[:, :, shuffled_indices]
+        # For CCM models, we may only need the batch_x and batch_y
+        # Shuffle the channels if needed
+        if self.args.features == 'M':
+            channel_dim = -1
+            num_channels = batch_x.shape[channel_dim]
+            shuffled_indices = torch.randperm(num_channels)
+            batch_x = batch_x[:, :, shuffled_indices]
+            batch_y = batch_y[:, :, shuffled_indices]
+        
+        # Get predictions
         outputs = self.model(batch_x, if_update=if_update)
 
+        # Handle inverse transform if needed
         if inverse:
             outputs = dataset_object.inverse_transform(outputs)
             batch_y = dataset_object.inverse_transform(batch_y)
+
         return outputs, batch_y
     
     def _similarity_loss_batch(self, prob, batch_x):

@@ -275,7 +275,6 @@ class Cluster_assigner(nn.Module):
         self.l2norm = lambda x: F.normalize(x, dim=1, p=2)
         self.p2c = CrossAttention(d_model, n_heads=1)
         
-        
     def forward(self, x, cluster_emb):     
         # x: [bs, seq_len, n_vars]
         # cluster_emb: [n_cluster, d_model]
@@ -283,18 +282,26 @@ class Cluster_assigner(nn.Module):
         x = x.permute(0,2,1)
         x_emb = self.linear(x).reshape(-1, self.d_model)      #[bs*n_vars, d_model]
         bn = x_emb.shape[0]
-        bs = max(int(bn/n_vars), 1) 
-        prob = torch.mm(self.l2norm(x_emb), self.l2norm(cluster_emb).t()).reshape(bs, n_vars, self.n_cluster)
-        # prob: [bs, n_vars, n_cluster]
+        bs = max(int(bn/n_vars), 1)
+        
+        # Ensure cluster_emb is 2D before transpose
+        if cluster_emb.dim() > 2:
+            cluster_emb = cluster_emb.reshape(-1, self.d_model)
+            
+        # Calculate similarity scores
+        prob = torch.mm(self.l2norm(x_emb), self.l2norm(cluster_emb).t())
+        prob = prob.reshape(bs, n_vars, self.n_cluster)
+        
+        # Rest of the forward method
         prob_temp = prob.reshape(-1, self.n_cluster)
         prob_temp = sinkhorn(prob_temp, epsilon=self.epsilon)
-        prob_avg = torch.mean(prob, dim=0)    #[n_vars, n_cluster]
+        prob_avg = torch.mean(prob, dim=0)      #[n_vars, n_cluster]
         prob_avg = sinkhorn(prob_avg, epsilon=self.epsilon)
         mask = self.concrete_bern(prob_avg)   #[bs, n_vars, n_cluster]
 
-        x_emb_ = x_emb.reshape(bs, n_vars,-1)
-        cluster_emb_ = cluster_emb.repeat(bs,1,1)
-        cluster_emb = self.p2c(cluster_emb_, x_emb_, x_emb_, mask=mask.transpose(0,1))
+        x_emb_ = x_emb.reshape(bs, n_vars, -1)
+        cluster_emb_ = cluster_emb.repeat(bs, 1, 1)
+        cluster_emb = self.p2c(cluster_emb_, x_emb_, x_emb_, mask=mask.transpose(0, 1))
 
         return prob_avg, cluster_emb
     

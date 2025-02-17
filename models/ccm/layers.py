@@ -284,19 +284,14 @@ class Cluster_assigner(nn.Module):
         x_emb = self.linear(x)  # [bs, n_vars, d_model]
         x_emb = x_emb.reshape(-1, self.d_model)  # [bs*n_vars, d_model]
         
-        # Print shapes for debugging
-        print(f"x_emb shape: {x_emb.shape}")
-        print(f"cluster_emb shape: {cluster_emb.shape}")
-        
-        # Ensure cluster_emb is 2D
+        # Ensure cluster_emb is 2D [n_cluster, d_model]
         if cluster_emb.dim() > 2:
-            cluster_emb = cluster_emb.reshape(-1, self.d_model)
+            cluster_emb = cluster_emb.reshape(self.n_cluster, self.d_model)
             
         # Calculate similarity scores
         prob = torch.mm(self.l2norm(x_emb), self.l2norm(cluster_emb).t())  # [bs*n_vars, n_cluster]
-        print(f"prob shape before reshape: {prob.shape}")
         
-        # Reshape prob using the correct batch size and n_vars
+        # Reshape prob using the correct dimensions
         prob = prob.reshape(bs, n_vars, self.n_cluster)
         
         # Rest of the forward method

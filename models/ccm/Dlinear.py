@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from models.layers import *
-from models.patch_layer import *
+from models.ccm.layers import *
+from models.ccm.patch_layer import *
 
 class moving_avg(nn.Module):
     """

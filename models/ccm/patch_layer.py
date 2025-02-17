@@ -7,8 +7,8 @@ from torch import Tensor
 from torch.nn.parameter import Parameter
 import torch.nn.functional as F
 import numpy as np
-from models.attention import *
-from models.layers import *
+from models.ccm.attention import *
+from models.ccm.layers import *
 
 # Cell
 class Patch_backbone(nn.Module):

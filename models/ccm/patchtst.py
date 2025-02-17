@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as f
-from models.layers import *
-from models.attention import *
-from models.patch_layer import *
+from models.ccm.layers import *
+from models.ccm.attention import *
+from models.ccm.patch_layer import *
 
 
 class PatchTSTC(nn.Module):

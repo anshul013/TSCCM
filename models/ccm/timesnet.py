@@ -3,10 +3,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.fft
 
-from models.emb_layers import DataEmbedding
-from models.conv_layers import Inception_Block_V1
-from models.patch_layer import Cluster_wise_linear
-from models.layers import Cluster_assigner
+from models.ccm.emb_layers import DataEmbedding
+from models.ccm.conv_layers import Inception_Block_V1
+from models.ccm.patch_layer import Cluster_wise_linear
+from models.ccm.layers import Cluster_assigner
 
 
 def FFT_for_Period(x, k=2):

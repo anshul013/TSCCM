@@ -1,0 +1,10 @@
+*.pyc
+*.pth
+runs/
+dataset/
+result.txt
+test_results/
+results/
+logs/
+scripts/Cluster-Exp/
+.DS_Store

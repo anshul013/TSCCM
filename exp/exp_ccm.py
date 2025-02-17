@@ -270,13 +270,15 @@ class Exp_CCM(Exp_Basic):
         
     
     def get_similarity_matrix(self, batch_x):
+        # Move batch_x to CPU for consistency or move everything to GPU
         sample = batch_x.squeeze(-1)  #[bsz, in_len]
         diff = sample.unsqueeze(1) - sample.unsqueeze(0)
-    # Compute the Euclidean distance (squared)
+        # Compute the Euclidean distance (squared)
         dist_squared = torch.sum(diff ** 2, dim=-1)  #[bsz, bsz]
         param = torch.max(dist_squared)
-        euc_similarity = torch.exp(-5 * dist_squared /param )
-        return euc_similarity    
+        euc_similarity = torch.exp(-5 * dist_squared /param)
+        # Move the similarity matrix to the same device as the model
+        return euc_similarity.to(self.device)
         
      
     def similarity_loss_batch(self, prob, simMatrix):
@@ -286,6 +288,10 @@ class Exp_CCM(Exp_Basic):
             prob = torch.log(prob + 1e-10) - torch.log(1.0 - prob + 1e-10)
             prob_bern = ((prob + random_noise) / temp).sigmoid()
             return prob_bern
+        
+        # Ensure simMatrix is on the same device
+        simMatrix = simMatrix.to(self.device)
+        
         membership = concrete_bern(prob)  #[n_vars, n_clusters]
         # membership = prob
         temp_1 = torch.mm(membership.t(), simMatrix) 

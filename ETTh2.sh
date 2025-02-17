@@ -6,11 +6,11 @@ if [ ! -d "./logs/LongForecasting" ]; then
     mkdir ./logs/LongForecasting
 fi
 
-if [ ! -d "./logs/LongForecasting/TSMixerCCM" ]; then
-    mkdir ./logs/LongForecasting/TSMixerCCM
+if [ ! -d "./logs/LongForecasting/TSMixerC" ]; then
+    mkdir ./logs/LongForecasting/TSMixerC
 fi
 seq_len=512
-model_name=TSMixerCCM
+model_name=TSMixerC
 dataset=ETTh2
 num_channels=7
 
@@ -18,10 +18,15 @@ num_channels=7
 pred_len=96
 python3 -u run_longExp.py \
   --activation 'relu' \
-  --dropout 0.9\
-  --hidden_size 8\
-  --num_clusters 10\
-  --num_blocks 4 \
+  --dropout 0.9 \
+  --beta 0.3 \
+  --n_layers 2 \
+  --d_ff 64 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -41,10 +46,15 @@ python3 -u run_longExp.py \
 pred_len=192
 python3 -u run_longExp.py \
   --activation 'relu' \
-  --dropout 0.9\
-  --hidden_size 8\
-  --num_clusters 10\
-  --num_blocks 1 \
+  --dropout 0.9 \
+  --beta 0.3 \
+  --n_layers 2 \
+  --d_ff 64 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -64,10 +74,15 @@ python3 -u run_longExp.py \
 pred_len=336
 python3 -u run_longExp.py \
   --activation 'relu' \
-  --dropout 0.9\
-  --hidden_size 16\
-  --num_clusters 10\
-  --num_blocks 1 \
+  --dropout 0.9 \
+  --beta 0.3 \
+  --n_layers 2 \
+  --d_ff 64 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -87,10 +102,15 @@ python3 -u run_longExp.py \
 pred_len=720
 python3 -u run_longExp.py \
   --activation 'relu' \
-  --dropout 0.1\
-  --hidden_size 64\
-  --num_clusters 10\
-  --num_blocks 2 \
+  --dropout 0.9 \
+  --beta 0.3 \
+  --n_layers 2 \
+  --d_ff 64 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \

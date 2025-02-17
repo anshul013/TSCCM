@@ -9,7 +9,7 @@ fi
 if [ ! -d "./logs/LongForecasting/TSMixerC" ]; then
     mkdir ./logs/LongForecasting/TSMixerC
 fi
-seq_len=336
+seq_len=512
 model_name=TSMixerC
 dataset=ETTh1
 num_channels=7
@@ -21,7 +21,8 @@ python3 -u run_longExp.py \
   --dropout 0.9 \
   --beta 0.3 \
   --n_layers 2 \
-  --d_model 128 \
+  --d_ff 128 \
+  --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
   --in_len $seq_len \
@@ -48,7 +49,8 @@ python3 -u run_longExp.py \
   --dropout 0.9 \
   --beta 0.3 \
   --n_layers 2 \
-  --d_model 128 \
+  --d_ff 128 \
+  --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
   --in_len $seq_len \
@@ -75,7 +77,8 @@ python3 -u run_longExp.py \
   --dropout 0.9 \
   --beta 0.3 \
   --n_layers 2 \
-  --d_model 128 \
+  --d_ff 128 \
+  --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
   --in_len $seq_len \
@@ -102,7 +105,8 @@ python3 -u run_longExp.py \
   --dropout 0.9 \
   --beta 0.3 \
   --n_layers 2 \
-  --d_model 128 \
+  --d_ff 128 \
+  --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
   --in_len $seq_len \

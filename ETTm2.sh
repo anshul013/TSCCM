@@ -6,12 +6,12 @@ if [ ! -d "./logs/LongForecasting" ]; then
     mkdir ./logs/LongForecasting
 fi
 
-if [ ! -d "./logs/LongForecasting/TSMixerCCM" ]; then
-    mkdir ./logs/LongForecasting/TSMixerCCM
+if [ ! -d "./logs/LongForecasting/TSMixerC" ]; then
+    mkdir ./logs/LongForecasting/TSMixerC
 fi
 
 seq_len=512
-model_name=TSMixerCCM
+model_name=TSMixerC
 dataset=ETTm2
 num_channels=7
 
@@ -20,9 +20,14 @@ pred_len=96
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9\
-  --hidden_size 256\
-  --num_clusters 10\
-  --num_blocks 8 \
+  --beta 0.9 \
+  --n_layers 2 \
+  --d_ff 24 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -43,9 +48,14 @@ pred_len=192
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9\
-  --hidden_size 256\
-  --num_clusters 10\
-  --num_blocks 1 \
+  --beta 0.9 \
+  --n_layers 2 \
+  --d_ff 24 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -66,9 +76,14 @@ pred_len=336
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9\
-  --hidden_size 512\
-  --num_clusters 10\
-  --num_blocks 8 \
+  --beta 0.9 \
+  --n_layers 2 \
+  --d_ff 24 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -88,10 +103,15 @@ python3 -u run_longExp.py \
 pred_len=720
 python3 -u run_longExp.py \
   --activation 'relu' \
-  --dropout 0.1\
-  --hidden_size 256\
-  --num_clusters 10\
-  --num_blocks 8 \
+  --dropout 0.9\
+  --beta 0.9 \
+  --n_layers 2 \
+  --d_ff 24 \
+  --cluster_ratio 0.3 \
+  --individual "c" \
+  --data_dim $num_channels \
+  --in_len $seq_len \
+  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \

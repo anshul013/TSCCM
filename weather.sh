@@ -11,16 +11,16 @@ if [ ! -d "./logs/LongForecasting/TSMixerC" ]; then
 fi
 seq_len=512
 model_name=TSMixerC
-dataset=ETTm1
-num_channels=7
+dataset=weather
+num_channels=21
 
 #Best configuration for ETTm2 and 96 frames horizon
 pred_len=96
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9 \
-  --beta 0.3 \
-  --n_layers 2 \
+  --beta 0.5 \
+  --n_layers 4 \
   --d_ff 64 \
   --cluster_ratio 0.3 \
   --individual "c" \
@@ -32,7 +32,7 @@ python3 -u run_longExp.py \
   --data_path $dataset.csv \
   --model_id $dataset'_'$seq_len'_'$pred_len \
   --model $model_name \
-  --data ETTm1 \
+  --data custom \
   --features M \
   --seq_len $seq_len \
   --pred_len $pred_len \
@@ -47,8 +47,8 @@ pred_len=192
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9 \
-  --beta 0.3 \
-  --n_layers 2 \
+  --beta 0.5 \
+  --n_layers 4 \
   --d_ff 64 \
   --cluster_ratio 0.3 \
   --individual "c" \
@@ -60,7 +60,7 @@ python3 -u run_longExp.py \
   --data_path $dataset.csv \
   --model_id $dataset'_'$seq_len'_'$pred_len \
   --model $model_name \
-  --data ETTm1 \
+  --data custom \
   --features M \
   --seq_len $seq_len \
   --pred_len $pred_len \
@@ -75,8 +75,8 @@ pred_len=336
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9 \
-  --beta 0.3 \
-  --n_layers 2 \
+  --beta 0.5 \
+  --n_layers 4 \
   --d_ff 64 \
   --cluster_ratio 0.3 \
   --individual "c" \
@@ -88,7 +88,7 @@ python3 -u run_longExp.py \
   --data_path $dataset.csv \
   --model_id $dataset'_'$seq_len'_'$pred_len \
   --model $model_name \
-  --data ETTm1 \
+  --data custom \
   --features M \
   --seq_len $seq_len \
   --pred_len $pred_len \
@@ -103,8 +103,8 @@ pred_len=720
 python3 -u run_longExp.py \
   --activation 'relu' \
   --dropout 0.9 \
-  --beta 0.3 \
-  --n_layers 2 \
+  --beta 0.5 \
+  --n_layers 4 \
   --d_ff 64 \
   --cluster_ratio 0.3 \
   --individual "c" \
@@ -116,7 +116,7 @@ python3 -u run_longExp.py \
   --data_path $dataset.csv \
   --model_id $dataset'_'$seq_len'_'$pred_len \
   --model $model_name \
-  --data ETTm1 \
+  --data custom \
   --features M \
   --seq_len $seq_len \
   --pred_len $pred_len \

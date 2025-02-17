@@ -280,7 +280,7 @@ class Exp_CCM(Exp_Basic):
         dist_squared = torch.sum(diff ** 2, dim=-1)  # [n_variables, n_variables]
         param = torch.max(dist_squared)
         euc_similarity = torch.exp(-5 * dist_squared / param)
-        return euc_similarity.to(self.device)
+        return euc_similarity.float().to(self.device)
         
      
     def similarity_loss_batch(self, prob, simMatrix):

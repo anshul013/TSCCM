@@ -25,8 +25,6 @@ python3 -u run_longExp.py \
   --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
-  --in_len $seq_len \
-  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -53,8 +51,6 @@ python3 -u run_longExp.py \
   --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
-  --in_len $seq_len \
-  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -81,8 +77,6 @@ python3 -u run_longExp.py \
   --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
-  --in_len $seq_len \
-  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \
@@ -109,8 +103,6 @@ python3 -u run_longExp.py \
   --cluster_ratio 0.3 \
   --individual "c" \
   --data_dim $num_channels \
-  --in_len $seq_len \
-  --out_len $pred_len \
   --is_training 1 \
   --root_path ./dataset/ \
   --data_path $dataset.csv \

@@ -134,6 +134,9 @@ parser.add_argument('--patch_len', type=int, default=16, help='patch length (L_s
 parser.add_argument('--padding_patch', type=str, default='end', help='None: None; end: padding on the end')
 parser.add_argument('--pretrain_head', type=bool, default=False, help='pretrain head')
 
+parser.add_argument('--n_layers', type=int, default=4, help='number of layers')
+parser.add_argument('--data_dim', type=int, default=21, help='data dimension')
+
 args = parser.parse_args()
 
 args.use_gpu = True if torch.cuda.is_available() and args.use_gpu else False

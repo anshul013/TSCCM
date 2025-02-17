@@ -29,10 +29,10 @@ class Exp_CCM(Exp_Basic):
     
     def _build_model(self):
         model_dict = {
-            'PatchTST': PatchTSTC,
-            'TSMixer': TSMixerC,
-            'DLinear': DLinearC,
-            'TimesNet': TimesNetC
+            'PatchTSTC': PatchTSTC,
+            'TSMixerC': TSMixerC,
+            'DLinearC': DLinearC,
+            'TimesNetC': TimesNetC
         }
         model = model_dict[self.args.model](self.args).float()
         summary(model)

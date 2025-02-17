@@ -97,7 +97,7 @@ class Exp_CCM(Exp_Basic):
             os.makedirs(path)
         with open(os.path.join(path, "args.json"), 'w') as f:
             json.dump(vars(self.args), f, indent=True)
-        scale_statistic = {'mean': train_data.scaler.mean, 'std': train_data.scaler.std}
+        scale_statistic = {'mean': train_data.scaler.mean_, 'std': train_data.scaler.std_}
         with open(os.path.join(path, "scale_statistic.pkl"), 'wb') as f:
             pickle.dump(scale_statistic, f)
         # s_type = "DTW" if self.args.data in ["ILI", "ETTm2", "ETTm1", "EXR", "ETTh2"] else "EUC"
@@ -289,62 +289,3 @@ class Exp_CCM(Exp_Basic):
         prob = torch.log(prob + 1e-10) - torch.log(1.0 - prob + 1e-10)
         prob_bern = ((prob + random_noise) / temp).sigmoid()
         return prob_bern
-    
-    
-    def eval(self, setting, save_pred = True, inverse = False):
-        # evaluate a saved model
-        args = self.args
-        data_set = Dataset_MTS(
-            root_path=args.root_path,
-            data_path=args.data_path,
-            flag='test',
-            size=[args.in_len, args.out_len],  
-            data_split = args.data_split,
-            scale = True,
-            scale_statistic = args.scale_statistic,
-        )
-
-        data_loader = DataLoader(
-            data_set,
-            batch_size=args.batch_size,
-            shuffle=False,
-            num_workers=args.num_workers,
-            drop_last=False)
-        
-        self.model.eval()
-        
-        preds = []
-        trues = []
-        metrics_all = []
-        instance_num = 0
-        
-        with torch.no_grad():
-            for i, (batch_x,batch_y) in enumerate(data_loader):
-                pred, true = self._process_one_batch(
-                    data_set, batch_x, batch_y, inverse, if_update=False)
-                batch_size = pred.shape[0]
-                instance_num += batch_size
-                batch_metric = np.array(metric(pred.detach().cpu().numpy(), true.detach().cpu().numpy())) * batch_size
-                metrics_all.append(batch_metric)
-                if (save_pred):
-                    preds.append(pred.detach().cpu().numpy())
-                    trues.append(true.detach().cpu().numpy())
-
-        metrics_all = np.stack(metrics_all, axis = 0)
-        metrics_mean = metrics_all.sum(axis = 0) / instance_num
-
-        # result save
-        folder_path = './results/' + setting +'/'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        mae, mse, rmse, mape, mspe = metrics_mean
-        print('mse:{}, mae:{}'.format(mse, mae))
-
-        np.save(folder_path+'metrics.npy', np.array([mae, mse, rmse, mape, mspe]))
-        if (save_pred):
-            preds = np.concatenate(preds, axis = 0)
-            trues = np.concatenate(trues, axis = 0)
-            np.save(folder_path+'pred.npy', preds)
-            np.save(folder_path+'true.npy', trues)
-        return mae, mse, rmse, mape, mspe

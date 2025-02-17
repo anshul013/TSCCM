@@ -280,13 +280,17 @@ class Cluster_assigner(nn.Module):
         # cluster_emb: [n_cluster, d_model]
         n_vars = x.shape[-1]
         bs = x.shape[0]
+        
+        print(f"Input cluster_emb shape: {cluster_emb.shape}")
+        print(f"Input cluster_emb size: {cluster_emb.numel()}")
+        
         x = x.permute(0,2,1)  # [bs, n_vars, seq_len]
         x_emb = self.linear(x)  # [bs, n_vars, d_model]
         x_emb = x_emb.reshape(-1, self.d_model)  # [bs*n_vars, d_model]
         
-        # Ensure cluster_emb is 2D [n_cluster, d_model]
+        # If cluster_emb is 3D [bs, n_cluster, d_model], take the first batch
         if cluster_emb.dim() > 2:
-            cluster_emb = cluster_emb.reshape(self.n_cluster, self.d_model)
+            cluster_emb = cluster_emb[0]  # Take first batch as reference
             
         # Calculate similarity scores
         prob = torch.mm(self.l2norm(x_emb), self.l2norm(cluster_emb).t())  # [bs*n_vars, n_cluster]

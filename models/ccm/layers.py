@@ -3,7 +3,7 @@ from torch import nn
 import math
 import torch.nn.functional as F
 from einops import rearrange, repeat
-from models.attention import *
+from models.ccm.attention import *
 
 
 class Transpose(nn.Module):

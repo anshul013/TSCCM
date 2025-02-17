@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from models.layers import *
-from models.patch_layer import *
+from models.ccm.layers import *
+from models.ccm.patch_layer import *
 
 
 class RevNorm(nn.Module):
@@ -60,11 +60,10 @@ class TSMixerC(nn.Module):
     def __init__(self, args):
         super(TSMixerC, self).__init__()
         self.n_vars = args.batch_size if args.data in ["M4", "stock"] else args.data_dim
-        self.in_len = args.in_len
-        self.out_len = args.out_len
+        self.in_len = args.seq_len
+        self.out_len = args.pred_len
         self.n_cluster = args.n_cluster
         self.d_ff = args.d_ff
-        self.d_model = args.d_model
         self.device = torch.device(f"cuda:{args.cuda}" if torch.cuda.is_available() else "cpu")
         self.individual = args.individual
         self.mixer_layers = []
@@ -83,12 +82,12 @@ class TSMixerC(nn.Module):
             self.cluster_prob, cluster_emb = self.Cluster_assigner(x, self.cluster_emb)
         else:
             self.cluster_prob = None
-        # x = self.rev_in(x, mode = "norm")
+        x = self.rev_in(x, mode = "norm")
 
         for i in range(self.n_mixer):
             x = self.mixer_layers[i](x, self.cluster_prob)
         x = self.temp_proj(x, self.cluster_prob)
-        # x = self.rev_in(x, mode="denorm")
+        x = self.rev_in(x, mode="denorm")
         if if_update and self.individual == "c":
             self.cluster_emb = nn.Parameter(cluster_emb, requires_grad=True)
         return x

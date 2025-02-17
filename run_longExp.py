@@ -1,5 +1,6 @@
 import argparse
 import os
+import math
 import random
 import numpy as np
 import torch
@@ -143,6 +144,7 @@ if args.use_gpu and args.use_multi_gpu:
     args.device_ids = [int(id_) for id_ in device_ids]
     args.gpu = args.device_ids[0]
 
+args.n_cluster = math.ceil(args.data_dim * args.cluster_ratio)
 print('Args in experiment:')
 print(args)
 
@@ -156,7 +158,7 @@ if args.is_training:
     for ii in range(args.itr):
         # setting record of experiments
         if args.model in ccm_models:
-            setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_cr{}_bt{}_{}'.format(
+            setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_nl{}_df{}_cr{}_bt{}_{}'.format(
                 args.model_id,
                 args.model,
                 args.data,
@@ -164,14 +166,8 @@ if args.is_training:
                 args.seq_len,
                 args.label_len,
                 args.pred_len,
-                args.d_model,
-                args.n_heads,
-                args.e_layers,
-                args.d_layers,
+                args.n_layers,
                 args.d_ff,
-                args.factor,
-                args.embed,
-                args.distil,
                 args.cluster_ratio,
                 args.beta,
                 args.des, ii)
@@ -210,7 +206,7 @@ if args.is_training:
 else:
     ii = 0
     if args.model in ccm_models:
-        setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_cr{}_bt{}_{}'.format(
+        setting = '{}_{}_{}_ft{}_sl{}_ll{}_pl{}_nl{}_df{}_cr{}_bt{}_{}'.format(
             args.model_id,
             args.model,
             args.data,
@@ -218,14 +214,8 @@ else:
             args.seq_len,
             args.label_len,
             args.pred_len,
-            args.d_model,
-            args.n_heads,
-            args.e_layers,
-            args.d_layers,
+            args.n_layers,
             args.d_ff,
-            args.factor,
-            args.embed,
-            args.distil,
             args.cluster_ratio,
             args.beta,
             args.des, ii)

@@ -270,14 +270,16 @@ class Exp_CCM(Exp_Basic):
         
     
     def get_similarity_matrix(self, batch_x):
-        # Move batch_x to CPU for consistency or move everything to GPU
-        sample = batch_x.squeeze(-1)  #[bsz, in_len]
-        diff = sample.unsqueeze(1) - sample.unsqueeze(0)
-        # Compute the Euclidean distance (squared)
-        dist_squared = torch.sum(diff ** 2, dim=-1)  #[bsz, bsz]
+        # batch_x shape: [batch_size, seq_len, n_variables]
+        # We want similarity between variables, so we'll use the mean over batch and time
+        batch_x = batch_x.permute(2, 0, 1)  # [n_variables, batch_size, seq_len]
+        batch_x = batch_x.reshape(batch_x.shape[0], -1)  # [n_variables, batch_size * seq_len]
+        
+        # Compute pairwise distances between variables
+        diff = batch_x.unsqueeze(1) - batch_x.unsqueeze(0)  # [n_variables, n_variables, batch_size * seq_len]
+        dist_squared = torch.sum(diff ** 2, dim=-1)  # [n_variables, n_variables]
         param = torch.max(dist_squared)
-        euc_similarity = torch.exp(-5 * dist_squared /param)
-        # Move the similarity matrix to the same device as the model
+        euc_similarity = torch.exp(-5 * dist_squared / param)
         return euc_similarity.to(self.device)
         
      
@@ -289,16 +291,20 @@ class Exp_CCM(Exp_Basic):
             prob_bern = ((prob + random_noise) / temp).sigmoid()
             return prob_bern
         
-        # Ensure simMatrix is on the same device
+        # Ensure simMatrix is on the same device and is 2D
         simMatrix = simMatrix.to(self.device)
         
-        membership = concrete_bern(prob)  #[n_vars, n_clusters]
-        # membership = prob
-        temp_1 = torch.mm(membership.t(), simMatrix) 
-        SAS = torch.mm(temp_1, membership)
-        _SS = 1 - torch.mm(membership, membership.t())
+        # prob shape should be [n_variables, n_clusters]
+        membership = concrete_bern(prob)  # [n_variables, n_clusters]
+        
+        # Matrix multiplications
+        temp_1 = torch.mm(membership.t(), simMatrix)  # [n_clusters, n_variables]
+        SAS = torch.mm(temp_1, membership)  # [n_clusters, n_clusters]
+        _SS = 1 - torch.mm(membership, membership.t())  # [n_variables, n_variables]
+        
         loss = -torch.trace(SAS) + torch.trace(torch.mm(_SS, simMatrix)) + membership.shape[0]
         ent_loss = (-prob * torch.log(prob + 1e-15)).sum(dim=-1).mean()
+        
         return loss + ent_loss
         
     def concrete_bern(self, prob, temp = 0.07):

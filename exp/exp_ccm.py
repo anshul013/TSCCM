@@ -246,6 +246,10 @@ class Exp_CCM(Exp_Basic):
             outputs = dataset_object.inverse_transform(outputs)
             batch_y = dataset_object.inverse_transform(batch_y)
 
+        # Only use the prediction length portion of batch_y
+        f_dim = -1 if self.args.features == 'MS' else 0
+        batch_y = batch_y[:, -self.args.pred_len:, f_dim:]
+
         return outputs, batch_y
     
     def _similarity_loss_batch(self, prob, batch_x):
